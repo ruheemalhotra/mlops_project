@@ -101,20 +101,4 @@ joblib.dump(threshold, "model/threshold.pkl")
 
 print(" Model, Scaler, Threshold saved successfully!")
 
-# 8. Visualization (Reconstruction Error)
 
-import matplotlib.pyplot as plt
-
-# Create plot
-plt.figure()
-plt.hist(mse, bins=50)
-plt.axvline(threshold)
-
-plt.title("Reconstruction Error Distribution")
-plt.xlabel("Reconstruction Error")
-plt.ylabel("Frequency")
-
-# Save plot
-plt.savefig("model/error_distribution.png")
-
-print("Visualization saved as error_distribution.png")
