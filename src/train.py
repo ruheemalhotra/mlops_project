@@ -18,9 +18,9 @@ from tensorflow.keras import layers, models
 np.random.seed(42)
 tf.random.set_seed(42)
 
-# ======================================
+
 # 1. Load Dataset
-# ======================================
+
 data_path = "data/blood_cell_anomaly_detection.csv"
 
 if not os.path.exists(data_path):
@@ -28,10 +28,8 @@ if not os.path.exists(data_path):
 
 df = pd.read_csv(data_path)
 print("Original Shape:", df.shape)
-
-# ======================================
 # 2. Preprocessing
-# ======================================
+
 # Keep only numeric columns
 df = df.select_dtypes(include=['float64', 'int64'])
 
@@ -49,9 +47,8 @@ X_train, X_test = train_test_split(
     data_scaled, test_size=0.2, random_state=42
 )
 
-# ======================================
 # 3. Build Autoencoder Model
-# ======================================
+
 input_dim = X_train.shape[1]
 
 model = models.Sequential([
@@ -68,9 +65,9 @@ model.compile(optimizer='adam', loss='mse')
 
 model.summary()
 
-# ======================================
+
 # 4. Train Model
-# ======================================
+
 history = model.fit(
     X_train, X_train,
     epochs=10,  # Reduced for CI speed
@@ -80,15 +77,13 @@ history = model.fit(
     verbose=1
 )
 
-# ======================================
 # 5. Reconstruction Error
-# ======================================
+
 reconstructions = model.predict(data_scaled)
 mse = np.mean(np.power(data_scaled - reconstructions, 2), axis=1)
 
-# ======================================
 # 6. Threshold Calculation
-# ======================================
+
 threshold = np.mean(mse) + 2 * np.std(mse)
 print("Threshold:", threshold)
 
@@ -96,13 +91,30 @@ print("Threshold:", threshold)
 anomalies = mse > threshold
 print("Total anomalies detected:", np.sum(anomalies))
 
-# ======================================
 # 7. Save Model + Scaler + Threshold
-# ======================================
+
 os.makedirs("model", exist_ok=True)
 
 model.save("model/autoencoder.h5")
 joblib.dump(scaler, "model/scaler.pkl")
 joblib.dump(threshold, "model/threshold.pkl")
 
-print("✅ Model, Scaler, Threshold saved successfully!")
+print(" Model, Scaler, Threshold saved successfully!")
+
+# 8. Visualization (Reconstruction Error)
+
+import matplotlib.pyplot as plt
+
+# Create plot
+plt.figure()
+plt.hist(mse, bins=50)
+plt.axvline(threshold)
+
+plt.title("Reconstruction Error Distribution")
+plt.xlabel("Reconstruction Error")
+plt.ylabel("Frequency")
+
+# Save plot
+plt.savefig("model/error_distribution.png")
+
+print("Visualization saved as error_distribution.png")
