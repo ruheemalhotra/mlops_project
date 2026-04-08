@@ -17,8 +17,4 @@ jobs:
     - name: Run Docker Container
       run: docker run mlops-project
 
-    - name: Upload Visualization
-      uses: actions/upload-artifact@v3
-      with:
-        name: plots
-        path: model/error_distribution.png
+
